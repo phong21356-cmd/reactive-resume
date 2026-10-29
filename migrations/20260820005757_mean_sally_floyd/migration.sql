@@ -1,1 +1,0 @@
-ALTER TABLE "agent_threads" ADD COLUMN "review_patches" boolean DEFAULT false NOT NULL;

@@ -1,2 +1,0 @@
-CREATE INDEX "cover_letter_trashed_at_index" ON "cover_letter" ("trashed_at") WHERE "trashed_at" is not null;--> statement-breakpoint
-CREATE INDEX "resume_trashed_at_index" ON "resume" ("trashed_at") WHERE "trashed_at" is not null;

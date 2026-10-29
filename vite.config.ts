@@ -1,195 +1,93 @@
-import { defineConfig } from "vite-plus";
-
-const workspaceImportPatterns = [
-	{
-		regex: "@reactive-resume/[^/]+/src(?:/|$)|(?:^|/)(?:apps|packages)/[^/]+/src(?:/|$)",
-		message:
-			"Use the workspace package export map instead of private src paths, including re-exports and dynamic imports.",
-	},
-	{
-		group: ["apps/**", "packages/**"],
-		message: "Do not import another workspace by repository path; use an explicit package export.",
-	},
-];
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-	lint: {
-		plugins: ["typescript", "unicorn", "oxc", "react", "jsx-a11y"],
-		jsPlugins: ["@shadcn/lint"],
-		categories: {
-			correctness: "error",
-		},
-		ignorePatterns: [
-			"**/.turbo/**",
-			"**/.output/**",
-			"**/dist/**",
-			"**/dist-cloudflare/**",
-			"**/dist-prerender/**",
-			"**/.vercel/**",
-			"**/.wrangler/**",
-			"**/coverage/**",
-			"**/reports/**",
-			"**/routeTree.gen.ts",
-		],
-		rules: {
-			"typescript/no-explicit-any": "error",
-			"require-await": "error",
-			"typescript/consistent-type-imports": [
-				"error",
-				{
-					prefer: "type-imports",
-					fixStyle: "separate-type-imports",
-					disallowTypeAnnotations: false,
-				},
-			],
-			"typescript/no-non-null-assertion": "error",
-			"no-restricted-imports": [
-				"error",
-				{
-					patterns: workspaceImportPatterns,
-				},
-			],
-			"no-param-reassign": "error",
-			"typescript/prefer-as-const": "error",
-			"default-param-last": "error",
-			"typescript/prefer-enum-initializers": "error",
-			"react/self-closing-comp": "error",
-			"one-var": ["error", "never"],
-			"unicorn/prefer-number-properties": "error",
-			"typescript/no-inferrable-types": "error",
-			"no-else-return": "error",
-			"react/no-array-index-key": "off",
-			"react/exhaustive-deps": "warn",
-			"react/unsupported-syntax": "error",
-			"no-unused-vars": [
-				"error",
-				{
-					argsIgnorePattern: "^_",
-					varsIgnorePattern: "^_",
-					caughtErrorsIgnorePattern: "^_",
-				},
-			],
-			"typescript/triple-slash-reference": [
-				"error",
-				{
-					path: "always",
-					types: "prefer-import",
-					lib: "always",
-				},
-			],
-			"jsx-a11y/prefer-tag-over-role": "off",
-			"jsx-a11y/control-has-associated-label": "off",
-			"jsx-a11y/no-noninteractive-element-interactions": "off",
-			"jsx-a11y/no-autofocus": [
-				"error",
-				{
-					ignoreNonDOM: true,
-				},
-			],
-			"unicorn/no-new-array": "off",
-			"no-irregular-whitespace": [
-				"error",
-				{
-					skipComments: true,
-				},
-			],
-			"react/no-danger": "error",
-			"react/rules-of-hooks": "error",
-		},
-		overrides: [
-			{
-				files: ["apps/mobile/**"],
-				rules: {
-					"no-restricted-imports": [
-						"error",
-						{
-							patterns: [
-								...workspaceImportPatterns,
-								{
-									group: ["@reactive-resume/api", "@reactive-resume/api/*"],
-									allowTypeImports: true,
-									message:
-										"The app may only import types from the server API (it is a type-only peer dependency); call it through src/api/client.ts.",
-								},
-							],
-						},
-					],
-				},
-			},
-			{
-				files: ["**/*.test.{ts,tsx,mts,mjs}", "**/*.spec.{ts,tsx,mts,mjs}"],
-				rules: {
-					"require-await": "off",
-				},
-			},
-			{
-				files: ["tests/e2e/fixtures/test.ts"],
-				rules: {
-					"react/rules-of-hooks": "off",
-				},
-			},
-		],
-	},
-	fmt: {
-		useTabs: true,
-		printWidth: 120,
-		sortPackageJson: false,
-		sortImports: {
-			newlinesBetween: false,
-			customGroups: [
-				{
-					groupName: "types",
-					selector: "type",
-				},
-				{
-					groupName: "tests",
-					elementNamePattern: ["vite-plus/test", "vite-plus/test/**", "@testing-library/**"],
-				},
-				{
-					groupName: "workspace",
-					elementNamePattern: ["@reactive-resume/**"],
-				},
-			],
-			groups: [
-				"types",
-				"value-builtin",
-				"tests",
-				"value-external",
-				"workspace",
-				["value-internal", "value-parent", "value-sibling", "value-index"],
-				"unknown",
-			],
-		},
-		sortTailwindcss: {
-			stylesheet: "./packages/ui/src/styles/globals.css",
-			functions: ["clsx", "cva", "cn"],
-		},
-		ignorePatterns: [
-			"**/.turbo/**",
-			"**/.output/**",
-			"**/dist/**",
-			"**/dist-cloudflare/**",
-			"**/dist-prerender/**",
-			"**/.vercel/**",
-			"**/.wrangler/**",
-			"**/coverage/**",
-			"**/reports/**",
-			"**/routeTree.gen.ts",
-			"packages/pdf/src/semantic/__fixtures__/**/*.css",
-			"pnpm-lock.yaml",
-			"migrations/**",
-			"docs/spec.json",
-			"docs/guides/json-resume-schema.mdx",
-			"plugins/reactive-resume/skills/resume-builder/references/schema.md",
-		],
-		overrides: [
-			{
-				files: ["**/*.md", "**/*.mdx"],
-				options: {
-					proseWrap: "preserve",
-					useTabs: false,
-				},
-			},
-		],
-	},
+  plugins: [
+    react(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg', 'photos/sample-picture.jpg'],
+      manifest: {
+        id: '/',
+        name: 'Reactive Resume',
+        short_name: 'RxResume',
+        description:
+          'Free and open-source resume builder to create, edit, customize, and export professional resumes and cover letters.',
+        theme_color: '#0f172a',
+        background_color: '#0f172a',
+        display: 'standalone',
+        orientation: 'portrait-primary',
+        start_url: '/',
+        scope: '/',
+        icons: [
+          {
+            src: '/pwa-192x192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/pwa-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: '/pwa-maskable-512x512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff,woff2}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
+      },
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+    }),
+  ],
+  server: {
+    host: '0.0.0.0',
+    port: 3000,
+  },
+  preview: {
+    host: '0.0.0.0',
+    port: 3000,
+  },
 });

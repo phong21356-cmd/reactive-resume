@@ -1,0 +1,7 @@
+{
+  "name": "Reactive Resume",
+  "description": "Free and open-source resume builder to create, edit, customize, and export professional resumes and cover letters.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

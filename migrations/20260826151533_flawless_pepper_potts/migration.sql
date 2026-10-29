@@ -1,1 +1,0 @@
-DROP TABLE "resume_analysis";
